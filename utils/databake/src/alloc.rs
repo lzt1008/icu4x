@@ -130,10 +130,11 @@ fn hash_set() {
     );
 }
 
-impl<K, V> Bake for std::collections::HashMap<K, V>
+impl<K, V, S> Bake for std::collections::HashMap<K, V, S>
 where
     K: Bake,
     V: Bake,
+    S: std::hash::BuildHasher + Default,
 {
     fn bake(&self, ctx: &CrateEnv) -> TokenStream {
         ctx.insert("std");
@@ -147,7 +148,7 @@ where
             .collect::<Vec<_>>();
         data.sort_unstable_by_key(|data| data.to_string());
         quote! {
-            std::collections::HashMap::from([#(#data),*])
+            std::collections::HashMap::from_iter([#(#data),*])
         }
     }
 }
